@@ -1,0 +1,35 @@
+apiVersion: apps.wavesenterprise.com/v1
+kind: WeMainnet
+metadata:
+  name: mainnet
+spec:
+  client_enabled: "true"
+  postgres_enabled: "true"
+#NODE
+  image: "wavesenterprise/node:v1.8.4"
+  replicas: 1
+  storage: "20Gi"
+#DOCKERHOST
+  image_dockerhost: "docker:19.03.1-dind"
+  privileged_dockerhost: true
+#CRAWLER
+  replicas_crawler: 1
+  image_crawler: "wavesenterprise/crawler2:v1.8.0"
+#AUTH
+  replicas_auth: 1
+  image_auth: "wavesenterprise/auth-service:v1.8.0"
+#DATASERVICE
+  replicas_ds: 1
+  image_ds: "wavesenterprise/data-service:v1.8.0"
+#FRONTEND
+  replicas_frontend: 1
+  image_frontend: "wavesenterprise/frontend-app:v1.8.0"
+#AUTH-ADMIN
+  replicas_auth_admin: 1
+  image_auth_admin: "wavesenterprise/auth-service-admin:v1.8.0"
+#Telegraf
+  replicas_telegraf: 1
+  image_telegraf: "telegraf:1.11-alpine"
+#Nginx
+  replicas_nginx: 1
+  image_nginx: "nginx:1.19.6"

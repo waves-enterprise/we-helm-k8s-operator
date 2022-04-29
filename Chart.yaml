@@ -1,0 +1,6 @@
+apiVersion: v2
+name: we-mainnet-k8s-operator-helm
+description: A Helm chart for "we-mainnet-k8s-operator"
+type: application
+version: 0.1.0
+appVersion: "latest"

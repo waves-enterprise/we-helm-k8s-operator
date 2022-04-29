@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-config
+data:
+  node-0.conf: |
+    node {
+      waves-crypto = "yes"
+      owner-address = "/ADDRESS/"
+      directory = "/node"
+      license.file = "/opt/licenses/node-0.license"      
+      data-directory = "/node/data"
+      wallet {
+        file = "/opt/wallets/node-0-keystore.dat"
+        password = "/PASSWORD/"
+      }
+      blockchain {
+        type = "MAINNET"
+      }
+      logging-level = "DEBUG"
+      network {
+        bind-address = "0.0.0.0"
+        port = 6864
+        known-peers = [
+          "cloud.wemeadow.com:6864"
+          "pool.wemeadow.com:6864"
+          "node-0.wavesenterprise.com:6864"
+          "node-1.wavesenterprise.com:6864"
+          "node-2.wavesenterprise.com:6864"
+        ]
+        node-name = "MAINNET_NODE_N"
+        peers-data-residence-time = "2h"
+        break-idle-connections-timeout = "3m"
+        declared-address = "0.0.0.0:6864"
+      }
+      api {
+        auth {
+          type = "api-key"
+          api-key-hash = "/API-KEY-HASH/"
+          privacy-api-key-hash = "/PRIVACY-API-KEY-HASH/"
+        }
+      }
+      miner {
+        enable = "yes"
+        quorum = 2
+        interval-after-last-block-then-generation-is-allowed = "35d"
+        micro-block-interval = "5s"
+        min-micro-block-age = "3s"
+        max-transactions-in-micro-block = 500
+        minimal-block-generation-offset = "200ms"
+      }
+      scheduler-service {
+        enable = "no"
+      }
+      privacy {
+        crawling-parallelism = 100
+        storage {
+          vendor = "none"
+        }
+      }
+      docker-engine {
+        enable = "yes"
+        use-node-docker-host = "yes"
+        default-registry-domain = "registry.wavesenterprise.com/waves-enterprise-public"
+        docker-host = "tcp://dockerhost:2375"
+        execution-limits {
+          timeout = "30s"
+          memory = 512
+          memory-swap = 0
+        }
+        reuse-containers = "yes"
+        remove-container-after = "10m"
+        remote-registries = []
+        check-registry-auth-on-startup = "yes"
+        contract-execution-messages-cache {
+          expire-after = "60m"
+          max-buffer-size = 10
+          max-buffer-time = "100ms"
+        }
+      }
+    }
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-license
+data:
+  node-0.license: |
+    {"license": /LICENSE/}

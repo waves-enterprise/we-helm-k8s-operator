@@ -1,0 +1,161 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+data:
+  app.config.json: |
+      {
+        "api": {
+          "registry": {
+            "providerName": "harbor",
+            "providerConfig": {
+              "harbor": {
+                "address": "/registry",
+                "projectId": 5
+              }
+            }
+          },
+          "nodeAddress": "/nodeAddress",
+          "dataServiceAddress": "/dataServiceAddress",
+          "nodeWavesAddress": "/nodeWaves",
+          "gatewayAddress": "/gateway",
+          "authServiceAddress": "/authServiceAddress",
+          "nodeStatsAddress": "/nodeStatsAddress"
+        },
+        "assetId": "",
+        "frozenAddress": "3NyAgGQgtYsdYEtiphvL2V8JLoSBdBQWcSu",
+        "oracleContractId": "Dgk1hR7xRnDT1KJreaXCVtZLrnd5LJ8uUYtoZyQrV1LJ",
+        "useDefaultMailService": "true",
+        "nodeStatsAddress": "/nodeStatsAddress",
+        "leasingDefaultNodes": [
+        { "node": "3NtEdFiScXXgXFiDeFTAuisrVR781crAyAp", "payout": 90 }
+        ,
+        { "node": "3NiVPB1t32jC3SJpLomY3Zv6kwvfaJpRkqS", "payout": 85 }
+        ,
+        { "node": "3NeY7AhrTCCtvZF5oV3tJRjUKc5FzuaHXxn", "payout": 90 }
+        ,
+        { "node": "3Nu1tgCX228vvydfS9rhwfv6XXQoaaGWW5v", "payout": 90 }
+        ,
+        { "node": "3Nx833eUz4hN1PV6KmGWqYaNt58r7dCHDxr", "payout": 91 }
+        ,
+        { "node": "3NzUk9f4hsroMwewewDUeciudZ6vMTNj9VM", "payout": 100 }
+        ,
+        { "node": "3NmDCwY6oi2yu7EMDNqmnJvy7ZLAK76hFgy", "payout": 90 }
+        ,
+        { "node": "3P1rpZPCF8DQffv2LfBtNucCWYHsBfkpfdv", "payout": 90 }
+        ,
+        { "node": "3NkV9d5ohyr58iWELPHCoa3rzQkT9BrVYSR", "payout": 90 }
+        ],
+            "metrics": {
+              "googleAnalytics": {
+                "token": ""
+              },
+              "yandexMetrics": {
+                "token": ""
+              }
+            }
+          }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-roles
+data:
+  roles.json: |
+    [
+          {
+            "name": "user",
+            "title": {
+              "ru": "Пользователь",
+              "en": "User"
+            },
+            "description": {
+              "ru": "Доступ к приложению и транзакциям",
+              "en": "Access to client and transactions"
+            }
+          },
+          {
+            "name": "admin",
+            "title": {
+              "ru": "Администратор учетных записей и узлов блокчейна",
+              "en": "Authorization administrator"
+            },
+            "description": {
+              "ru": "Администрирование учетных записей пользователей и сервиса авторизации, узлов сети",
+              "en": "Administration of user accounts and auth service, network nodes"
+            }
+          }
+    ]
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vars-node
+data:
+  WE_NODE_OWNER_PASSWORD: "/PASSWORD/"
+  WE_NODE_OWNER_PASSWORD_EMPTY: "false"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-config
+data:
+  telegraf.conf: |
+                  [global_tags]
+                  [agent]
+                  interval = "10s"
+                  round_interval = true
+                  metric_batch_size = 1000
+                  metric_buffer_limit = 10000
+                  collection_jitter = "0s"
+                  flush_interval = "10s"
+                  flush_jitter = "0s"
+                  precision = ""
+                  debug = false
+                  quiet = false
+                  logfile = ""
+                  hostname = ""
+                  omit_hostname = false
+                  [[outputs.influxdb]]
+                  urls = ["http://URL:8086"] # required
+                  database = "we_db"
+                  retention_policy = ""
+                  write_consistency = "any"
+                  timeout = "5s"
+                  username = "/USER/"
+                  password = "/PASSWORD/"
+                  [[inputs.influxdb_listener]]
+                  service_address = "0.0.0.0:8086"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-script
+data:
+  create-multiple-postgresql-databases.sh: |
+    #!/bin/bash
+
+    set -e
+    set -u
+
+    function create_user_and_database() {
+            local database=$1
+            echo "  Creating user and database '$database'"
+            psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
+                CREATE USER $database;
+                CREATE DATABASE $database;
+                GRANT ALL PRIVILEGES ON DATABASE $database TO $database;
+    EOSQL
+    }
+
+    if [ -n "$POSTGRES_MULTIPLE_DATABASES" ]; then
+            echo "Multiple database creation requested: $POSTGRES_MULTIPLE_DATABASES"
+            for db in $(echo $POSTGRES_MULTIPLE_DATABASES | tr ',' ' '); do
+                    create_user_and_database $db
+            done
+            echo "Multiple databases created"
+    fi

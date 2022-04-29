@@ -1,0 +1,92 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |-
+
+   worker_processes  auto;
+
+   events {
+       worker_connections  1024;
+   }
+
+   http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+
+    upstream frontend {
+      server frontend:8080;
+    }
+    upstream dataservice {
+      server dataservice:3001;
+    }
+    upstream nodeaddress {
+      server node:6862;
+    }
+    upstream authserviceaddress {
+      server service-auth-service:3000;
+    }
+    upstream node-0 {
+      server node-0:6862;
+    }
+     
+
+    server {
+      listen 80 default_server;
+      server_name nginx;
+      root  /usr/share/nginx/html;
+
+      gzip on;
+      gzip_disable "msie6";
+      gzip_comp_level 5;
+      gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript;
+
+      location / {
+      	add_header 'Access-Control-Allow-Origin' '*';
+      	add_header 'Access-Control-Allow-Credentials' 'false';
+      	add_header 'Access-Control-Allow-Methods' 'GET, POST';
+      	add_header 'X-Frame-Options' 'DENY';
+        proxy_pass http://frontend/;
+       }
+      location /dataServiceAddress/ {
+      	add_header 'Access-Control-Allow-Origin' '*';
+      	add_header 'Access-Control-Allow-Credentials' 'false';
+      	add_header 'Access-Control-Allow-Methods' 'GET, POST';
+      	add_header 'X-Frame-Options' 'DENY';
+        proxy_pass http://dataservice/;
+       }
+      location /nodeAddress/ {
+      	add_header 'Access-Control-Allow-Origin' '*';
+      	add_header 'Access-Control-Allow-Credentials' 'false';
+      	add_header 'Access-Control-Allow-Methods' 'GET, POST';
+      	add_header 'X-Frame-Options' 'DENY';
+        proxy_pass http://nodeaddress/;
+       }
+      location /authServiceAddress/ {
+      	add_header 'Access-Control-Allow-Origin' '*';
+      	add_header 'Access-Control-Allow-Credentials' 'false';
+      	add_header 'Access-Control-Allow-Methods' 'GET, POST';
+      	add_header 'X-Frame-Options' 'DENY';
+        proxy_pass http://authserviceaddress/;
+       }        
+      location /node-0/ {
+      	add_header 'Access-Control-Allow-Origin' '*';
+      	add_header 'Access-Control-Allow-Credentials' 'false';
+      	add_header 'Access-Control-Allow-Methods' 'GET, POST';
+      	add_header 'X-Frame-Options' 'DENY';
+        proxy_pass http://node-0/;
+       }   
+    }
+   }
+
+

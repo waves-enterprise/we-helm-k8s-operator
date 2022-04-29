@@ -1,0 +1,68 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-mainnet-role
+rules:
+- apiGroups:
+  - {{ .Values.apiSettings.resoureName }}
+  resources:
+  - {{ .Values.apiSettings.plural }}
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - {{ .Values.apiSettings.resoureName }}
+  resources:
+  - {{ .Values.apiSettings.plural }}/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - {{ .Values.apiSettings.resoureName }}
+  resources:
+  - {{ .Values.apiSettings.plural }}/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch

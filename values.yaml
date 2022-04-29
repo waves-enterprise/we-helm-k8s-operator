@@ -1,0 +1,13 @@
+replicaCount: 1
+image:
+  repository: registry.wvservices.com/waves-enterprise-public/we-mainnet-operator
+  tag: latest
+resoureName: apps.wavesenterprise.com
+apiSettings:
+  kind: WeMainnet
+  listKind: WeMainnetList
+  plural: wemainnets
+  singular: wemainnet
+  resoureName: apps.wavesenterprise.com
+controllerAnnotation: 
+  controllerGen: v0.7.0s

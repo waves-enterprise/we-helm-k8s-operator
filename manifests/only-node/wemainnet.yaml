@@ -1,0 +1,14 @@
+apiVersion: apps.wavesenterprise.com/v1
+kind: WeMainnet
+metadata:
+  name: mainnet
+spec:
+  client_enabled: "false"
+  postgres_enabled: "false"
+#NODE
+  image: "wavesenterprise/node:v1.8.4"
+  replicas: 1
+  storage: "20Gi"
+#DOCKERHOST
+  image_dockerhost: "docker:19.03.1-dind"
+  privileged_dockerhost: true
